@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # 1. MySQL 8 Database
+  db:
+    image: mysql:8.0
+    container_name: routinemate-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-MySQL@12345}
+      MYSQL_DATABASE: routine_mate
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-MySQL@12345}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - routinemate-network
+
+  # 2. Spring Boot Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: routinemate-backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/routine_mate?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-MySQL@12345}
+      APP_JWT_SECRET: ${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B59707336763979244226452948404D635166}
+      APP_PUSH_VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:admin@routinemate.com}
+    ports:
+      - "8080:8080"
+    networks:
+      - routinemate-network
+
+  # 3. React Frontend (Nginx Reverse Proxy)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: routinemate-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - routinemate-network
+
+networks:
+  routinemate-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local

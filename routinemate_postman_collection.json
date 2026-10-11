@@ -1,0 +1,271 @@
+{
+  "info": {
+    "_postman_id": "8f8a12b4-5c91-4e7a-bc12-d84319a009ef",
+    "name": "RoutineMate – Student Daily Routine Manager API",
+    "description": "Comprehensive Postman API Collection for RoutineMate Student Daily Routine Manager",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alex Johnson\",\n  \"email\": \"alex@routinemate.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alex@routinemate.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Get Current Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Routines Management",
+      "item": [
+        {
+          "name": "Get All Routines",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/routines", "host": ["{{baseUrl}}"], "path": ["routines"] }
+          }
+        },
+        {
+          "name": "Get Routines For Date",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/routines/date/2026-10-11", "host": ["{{baseUrl}}"], "path": ["routines", "date", "2026-10-11"] }
+          }
+        },
+        {
+          "name": "Create Routine",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Practice Data Structures & Algorithms\",\n  \"description\": \"Solve 2 LeetCode medium problems on Trees\",\n  \"category\": \"Coding\",\n  \"startTime\": \"20:00\",\n  \"endTime\": \"21:00\",\n  \"startDate\": \"2026-10-11\",\n  \"repeatType\": \"daily\",\n  \"priority\": \"high\",\n  \"reminderTimeMinutes\": 5,\n  \"recurringDays\": []\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/routines", "host": ["{{baseUrl}}"], "path": ["routines"] }
+          }
+        },
+        {
+          "name": "Mark Routine Complete",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/routines/1/complete", "host": ["{{baseUrl}}"], "path": ["routines", "1", "complete"] }
+          }
+        },
+        {
+          "name": "Mark Routine Skipped",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/routines/1/skip", "host": ["{{baseUrl}}"], "path": ["routines", "1", "skip"] }
+          }
+        },
+        {
+          "name": "Reset Routine to Pending",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/routines/1/pending", "host": ["{{baseUrl}}"], "path": ["routines", "1", "pending"] }
+          }
+        },
+        {
+          "name": "Delete Routine",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/routines/1", "host": ["{{baseUrl}}"], "path": ["routines", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard & Progress",
+      "item": [
+        {
+          "name": "Get Today Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/dashboard/today", "host": ["{{baseUrl}}"], "path": ["dashboard", "today"] }
+          }
+        },
+        {
+          "name": "Get Weekly Progress Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/progress/weekly", "host": ["{{baseUrl}}"], "path": ["progress", "weekly"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications & Alerts",
+      "item": [
+        {
+          "name": "Get All Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/notifications", "host": ["{{baseUrl}}"], "path": ["notifications"] }
+          }
+        },
+        {
+          "name": "Mark Notification Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/notifications/1/read", "host": ["{{baseUrl}}"], "path": ["notifications", "1", "read"] }
+          }
+        },
+        {
+          "name": "Mark All Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/notifications/read-all", "host": ["{{baseUrl}}"], "path": ["notifications", "read-all"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Push Notifications",
+      "item": [
+        {
+          "name": "Get VAPID Public Key",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/push/public-key", "host": ["{{baseUrl}}"], "path": ["push", "public-key"] }
+          }
+        },
+        {
+          "name": "Send Test Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/push/test", "host": ["{{baseUrl}}"], "path": ["push", "test"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "Get All Settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/settings", "host": ["{{baseUrl}}"], "path": ["settings"] }
+          }
+        },
+        {
+          "name": "Update Notification Preferences",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enabled\": true,\n  \"reminderIntervalMinutes\": 15,\n  \"quietStart\": \"22:00\",\n  \"quietEnd\": \"07:00\",\n  \"soundEnabled\": true,\n  \"theme\": \"dark\",\n  \"weekStartDay\": \"MONDAY\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/settings/notifications", "host": ["{{baseUrl}}"], "path": ["settings", "notifications"] }
+          }
+        }
+      ]
+    }
+  ]
+}
